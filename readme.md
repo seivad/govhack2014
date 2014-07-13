@@ -2,8 +2,9 @@
 
 Developed during a 46 hour period for GovHack 2014 Gold Coast group, SocialTest provides a simple online utility for exploring correlations between multiple datasets based on Suburbs and Postcodes. 
 
-Access to SocialTest is available at [SocialTest](http://#).
+## Using SocialTest
 
+Access to SocialTest is available at [SocialTest](http://#).
 
 ## About
 
