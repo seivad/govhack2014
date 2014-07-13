@@ -1,0 +1,116 @@
+/* Show count per offence type for a specific suburb */
+
+SELECT DISTINCT(offence_description) as offence_description, count(offence_description) as count
+FROM crime
+WHERE postcode = 4208
+GROUP BY offence_description
+HAVING count >= 1
+
+
+Other Property Damage	21
+Other Theft (excl. Unlawful Entry)	62
+Unlawful Entry	45
+
+
+
+
+
+/* Show count per offence type for a specific suburb between 2 dates */
+
+SELECT DISTINCT(offence_description) as offence_description, count(offence_description) as count
+FROM crime
+WHERE postcode = 4208 AND (start_date BETWEEN '2014-03-01' AND '2014-03-31')
+GROUP BY offence_description
+HAVING count >= 1
+
+
+Drug Offences	4
+Other Property Damage	5
+Other Theft (excl. Unlawful Entry)	23
+Unlawful Entry	16
+
+
+
+
+
+/* Show count per building type for a specific suburb and month with average weekly rent price
+
+SELECT DISTINCT(dwelling_type) as building_type, AVG(weekly_rent) as average_weekly_rent, count(dwelling_type) as count
+FROM bonds
+WHERE postcode = 4208 and month = 3
+GROUP BY dwelling_type
+HAVING count >= 1
+
+
+Flat	356.6666666666667	3
+House	420.7878787878788	66
+Townhouse	377	6
+
+
+
+/* get all centrelink results for a particular postcode */
+
+SELECT *
+FROM centrelink
+WHERE postcode = 4208
+
+
+
+
+/* Tally the count of crime incidents by the month per suburb */
+
+SELECT YEAR(start_date) as year, MONTH(start_date) as month, COUNT(*) as count
+FROM crime
+WHERE postcode = 4208 AND (start_date BETWEEN '2014-03-31' AND '2014-06-30')
+GROUP BY month
+
+Year, Month, Count
+2014	4	38
+2014	5	55
+2014	6	49
+
+
+
+
+
+/* Calculate total count of crime incidents per postcode over the life of the dataset */
+
+SELECT postcode, COUNT(*) AS count
+FROM crime
+GROUP BY postcode
+ORDER BY postcode ASC 
+
+NULL	101
+4121	1
+4207	373
+4208	356
+4209	1288
+4210	398
+4211	1446
+4212	649
+4213	464
+4214	880
+4215	2278
+4216	771
+4217	2384
+4218	1319
+4219	45
+4220	1006
+4221	751
+4222	9
+4223	225
+4224	170
+4225	426
+4226	550
+4227	419
+4228	47
+4229	15
+4230	253
+
+
+
+
+
+
+
+
