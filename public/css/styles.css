@@ -2,21 +2,26 @@
  * Globals
  */
 
- .socialmedia a {
-  color: #fff;
- }
-
-/* Custom default button */
-.btn-default,
-.btn-default:hover,
-.btn-default:focus {
-  color: #333;
-  text-shadow: none; /* Prevent inheritence from `body` */
-  background-color: #fff;
-  border: 1px solid #fff;
+html,
+body {
+  height: 100%;
+  background-color: #333;
 }
 body {
-  min-height: 2000px;
+  min-height: 1600px;
+  color: #fff;
+}
+
+input {
+  color: #333;
+}
+
+ul, ol {
+  text-align: left;
+}
+
+th {
+  text-align: center;
 }
 
 p {
@@ -32,34 +37,8 @@ margin: 0 0 10px;
   margin-bottom: 19px;
 }
 
-ul, ol {
-  text-align: left;
-}
-
-th {
-  text-align: center;
-}
-
 .chart {
   width: 100%; 
-}
-
-/*
- * Base structure
- */
-
-html,
-body {
-  height: 100%;
-  background-color: #333;
-}
-body {
-  min-height: 2000px;
-  color: #fff;
-}
-
-input {
-  color: #333;
 }
 
 .panel-group {
@@ -70,6 +49,19 @@ input {
   color: #333333;
 }
 
+ .socialmedia a {
+  color: #fff;
+ }
+
+/* Custom default button */
+.btn-default,
+.btn-default:hover,
+.btn-default:focus {
+  color: #333;
+  text-shadow: none; /* Prevent inheritence from `body` */
+  background-color: #fff;
+  border: 1px solid #fff;
+}
 
 
 /* Extra markup and styles for table-esque vertical and horizontal centering */
@@ -93,7 +85,6 @@ input {
 .inner {
   padding: 30px;
 }
-
 
 /*
  * Header
@@ -140,12 +131,6 @@ input {
   }
 }
 
-
-
-/*
- * Cover
- */
-
 .cover {
   padding: 0 20px;
   margin-top: 200px;
@@ -155,20 +140,10 @@ input {
   font-weight: bold;
 }
 
-
-/*
- * Footer
- */
-
 .mastfoot {
   color: #999; /* IE8 proofing */
   color: rgba(255,255,255,.5);
 }
-
-
-/*
- * Affix and center
- */
 
 @media (min-width: 768px) {
   /* Pull out the header and footer */
