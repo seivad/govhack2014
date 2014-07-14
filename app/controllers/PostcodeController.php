@@ -93,17 +93,21 @@ class PostcodeController extends \BaseController {
 
 		endif;
 
-
 		//Database Queries
-		$crimes = DB::table('crime')
+		$crimes = Cache::rememberForever('crimes' . $postcode, function() use ($postcode, $start_date, $end_date)
+		{
+		    return DB::table('crime')
 					->select(DB::raw('DISTINCT(offence_description) as offence_description, count(offence_description) as count'))
 					->where('postcode', '=', $postcode)
 					->whereBetween('start_date', array($start_date, $end_date))
 					->groupBy('offence_description')
 					->having('count', '>=', 1)
 					->get();
-
-		$crimeGraph = DB::table('crime')
+		});
+		
+		$crimeGraph = Cache::rememberForever('crimeGraph' . $postcode, function() use ($postcode, $start_date, $end_date)
+		{
+		    return DB::table('crime')
 						->select(DB::raw('YEAR(start_date) as year, MONTH(start_date) as month, COUNT(*) as count'))
 						->where('postcode', '=', $postcode)
 						->whereBetween('start_date', array($start_date, $end_date))	
@@ -111,17 +115,23 @@ class PostcodeController extends \BaseController {
 						->groupBy('month')
 						->orderBy('year', 'ASC')
 						->get();
+		});
 
-		$realestates = DB::table('bonds')
+		$realestates = Cache::rememberForever('realestates' . $postcode, function() use ($postcode, $previousMonthsNum, $monthNum)
+		{
+		    return DB::table('bonds')
 							->select(DB::raw('DISTINCT(dwelling_type) as building_type, AVG(weekly_rent) as average_weekly_rent, count(dwelling_type) as count'))
 							->where('postcode', '=', $postcode)
 							->whereBetween('month', array($previousMonthsNum, $monthNum))
 							->groupBy('dwelling_type')
 							->having('count', '>=', 1)
 							->get();
+		});
 
-		$centrelink = DB::table('centrelink')->where('postcode', '=', $postcode)->get();
-
+		$centrelink = Cache::rememberForever('centrelink' . $postcode, function() use ($postcode)
+		{
+		    return DB::table('centrelink')->where('postcode', '=', $postcode)->get();
+		});
 
 		//Treat the arrays
 		if( count($centrelink) > 1 ) :
@@ -138,9 +148,16 @@ class PostcodeController extends \BaseController {
 		$largerPostcode++;
 
 		//Get Adjacent Suburbs Centrelink Data for comparison
-		$compareToCentrelinkSmaller = DB::table('centrelink')->where('postcode', '=', $smallerPostcode)->get();
-		$compareToCentrelinkLarger = DB::table('centrelink')->where('postcode', '=', $largerPostcode)->get();
+		$compareToCentrelinkSmaller = Cache::rememberForever('compareToCentrelinkSmaller' . $postcode, function() use ($smallerPostcode)
+		{
+		    return DB::table('centrelink')->where('postcode', '=', $smallerPostcode)->get();
+		});
 
+		$compareToCentrelinkLarger = Cache::rememberForever('compareToCentrelinkLarger' . $postcode, function() use ($largerPostcode)
+		{
+		    return DB::table('centrelink')->where('postcode', '=', $largerPostcode)->get();
+		});
+		
 		//Remove the HTML issue with the less than sign in the database from the dataset
 		if( count($compareToCentrelinkSmaller) > 1 ) :
 		array_walk_recursive($compareToCentrelinkSmaller[0], function(&$value) {
@@ -155,29 +172,38 @@ class PostcodeController extends \BaseController {
 				});
 		endif;
 
-		$crimeTotal = DB::table('crime')
-								->select(DB::raw('postcode, COUNT(*) AS count'))
-								->where('postcode', '=', $postcode)
-								->whereBetween('start_date', array($start_date, $end_date))	
-								->groupBy('postcode')
-								->orderBy('postcode', 'ASC')
-								->get();
 
-		$highestCrime = DB::table('crime')
-								->select(DB::raw('postcode, offence_description, COUNT(*) AS count'))
-								->where('postcode', '=', $postcode)
-								->whereBetween('start_date', array($start_date, $end_date))	
-								->groupBy('postcode')
-								->groupBy('offence_description')
-								->orderBy('count', 'DESC')
-								->limit(1)
-								->get();
+		$crimeTotal = Cache::rememberForever('crimeTotal' . $postcode, function() use ($postcode, $start_date, $end_date)
+		{
+		    return DB::table('crime')
+						->select(DB::raw('postcode, COUNT(*) AS count'))
+						->where('postcode', '=', $postcode)
+						->whereBetween('start_date', array($start_date, $end_date))	
+						->groupBy('postcode')
+						->orderBy('postcode', 'ASC')
+						->get();
+		});
 
-		$crimeTotalPerPostcode = DB::table('crime')
-								->select(DB::raw('postcode, suburb, COUNT(*) AS count'))
-								->groupBy('postcode')
-								->get();
+		$highestCrime = Cache::rememberForever('highestCrime' . $postcode, function() use ($postcode, $start_date, $end_date)
+		{
+		    return DB::table('crime')
+						->select(DB::raw('postcode, offence_description, COUNT(*) AS count'))
+						->where('postcode', '=', $postcode)
+						->whereBetween('start_date', array($start_date, $end_date))	
+						->groupBy('postcode')
+						->groupBy('offence_description')
+						->orderBy('count', 'DESC')
+						->limit(1)
+						->get();
+		});
 
+		$crimeTotalPerPostcode = Cache::rememberForever('crimeTotalPerPostcode' . $postcode, function()
+		{
+		    return DB::table('crime')
+						->select(DB::raw('postcode, suburb, COUNT(*) AS count'))
+						->groupBy('postcode')
+						->get();
+		});
 
 		$crimePercentage = array();
 		$total = 0;
