@@ -105,7 +105,7 @@ class PostcodeController extends \BaseController {
 
 		$crimeGraph = DB::table('crime')
 						->select(DB::raw('YEAR(start_date) as year, MONTH(start_date) as month, COUNT(*) as count'))
-						->WHERE('postcode', '=', $postcode)
+						->where('postcode', '=', $postcode)
 						->whereBetween('start_date', array($start_date, $end_date))	
 						->groupBy('year')
 						->groupBy('month')
@@ -148,7 +148,6 @@ class PostcodeController extends \BaseController {
 				});	
 		endif;
 	
-	
 		//Remove the HTML issue with the less than sign in the database from the dataset
 		if( count($compareToCentrelinkLarger) > 1 ) :
 		array_walk_recursive($compareToCentrelinkLarger[0], function(&$value) {
@@ -158,7 +157,7 @@ class PostcodeController extends \BaseController {
 
 		$crimeTotal = DB::table('crime')
 								->select(DB::raw('postcode, COUNT(*) AS count'))
-								->WHERE('postcode', '=', $postcode)
+								->where('postcode', '=', $postcode)
 								->whereBetween('start_date', array($start_date, $end_date))	
 								->groupBy('postcode')
 								->orderBy('postcode', 'ASC')
@@ -166,7 +165,7 @@ class PostcodeController extends \BaseController {
 
 		$highestCrime = DB::table('crime')
 								->select(DB::raw('postcode, offence_description, COUNT(*) AS count'))
-								->WHERE('postcode', '=', $postcode)
+								->where('postcode', '=', $postcode)
 								->whereBetween('start_date', array($start_date, $end_date))	
 								->groupBy('postcode')
 								->groupBy('offence_description')
@@ -202,42 +201,6 @@ class PostcodeController extends \BaseController {
 	{
 	    //Above All Else, Look Good
 	    return Redirect::to('/');
-	}
-
-	/**
-	 * Show the form for editing the specified resource.
-	 * GET /postcode/{id}/edit
-	 *
-	 * @param  int  $id
-	 * @return Response
-	 */
-	public function edit($id)
-	{
-		//
-	}
-
-	/**
-	 * Update the specified resource in storage.
-	 * PUT /postcode/{id}
-	 *
-	 * @param  int  $id
-	 * @return Response
-	 */
-	public function update($id)
-	{
-		//
-	}
-
-	/**
-	 * Remove the specified resource from storage.
-	 * DELETE /postcode/{id}
-	 *
-	 * @param  int  $id
-	 * @return Response
-	 */
-	public function destroy($id)
-	{
-		//
 	}
 
 }
