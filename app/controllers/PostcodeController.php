@@ -23,9 +23,8 @@ class PostcodeController extends \BaseController {
 									unset($crimeTotalPerPostcode[0]);
 
 
-		return View::make('postcode.index')
-						->with('postcodes', $postcodes)
-						->with('crimeTotalPerPostcode', $crimeTotalPerPostcode);
+		return View::make('postcode.index',  compact('postcodes', 'crimeTotalPerPostcode'));
+
 	}
 
 	/**
@@ -126,11 +125,10 @@ class PostcodeController extends \BaseController {
 
 		//Treat the arrays
 		if( count($centrelink) > 1 ) :
-array_walk_recursive($centrelink[0], function(&$value) {
-		  $value = htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
-		});
-endif;
-
+			array_walk_recursive($centrelink[0], function(&$value) {
+				$value = htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
+			});
+		endif;
 
 		//Used for Centrelink Comparisons
 		$smallerPostcode = $postcode;
@@ -144,19 +142,19 @@ endif;
 		$compareToCentrelinkLarger = DB::table('centrelink')->where('postcode', '=', $largerPostcode)->get();
 
 		//Remove the HTML issue with the less than sign in the database from the dataset
-if( count($compareToCentrelinkSmaller) > 1 ) :
-array_walk_recursive($compareToCentrelinkSmaller[0], function(&$value) {
-		  $value = htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
-		});	
-endif;
+		if( count($compareToCentrelinkSmaller) > 1 ) :
+		array_walk_recursive($compareToCentrelinkSmaller[0], function(&$value) {
+				  $value = htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
+				});	
+		endif;
 	
 	
 		//Remove the HTML issue with the less than sign in the database from the dataset
-if( count($compareToCentrelinkLarger) > 1 ) :
-array_walk_recursive($compareToCentrelinkLarger[0], function(&$value) {
-		  $value = htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
-		});
-endif;
+		if( count($compareToCentrelinkLarger) > 1 ) :
+		array_walk_recursive($compareToCentrelinkLarger[0], function(&$value) {
+				  $value = htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
+				});
+		endif;
 
 		$crimeTotal = DB::table('crime')
 								->select(DB::raw('postcode, COUNT(*) AS count'))
@@ -165,9 +163,6 @@ endif;
 								->groupBy('postcode')
 								->orderBy('postcode', 'ASC')
 								->get();
-								
-								//print_r($crimeTotal);
-								//exit;
 
 		$highestCrime = DB::table('crime')
 								->select(DB::raw('postcode, offence_description, COUNT(*) AS count'))
@@ -179,45 +174,28 @@ endif;
 								->limit(1)
 								->get();
 
-
-
-$crimeTotalPerPostcode = DB::table('crime')
+		$crimeTotalPerPostcode = DB::table('crime')
 								->select(DB::raw('postcode, suburb, COUNT(*) AS count'))
 								->groupBy('postcode')
 								->get();
 
 
-$crimePercentage = array();
-$total = 0;
+		$crimePercentage = array();
+		$total = 0;
 
-foreach($crimeTotalPerPostcode as $crime) {
-	$total = $total + $crime->count;
-}
+		foreach($crimeTotalPerPostcode as $crime) {
+			$total = $total + $crime->count;
+		}
 
-foreach($crimeTotalPerPostcode as $crime) {
-	$crimePercentage[$crime->postcode] = number_format((($crime->count / $total) * 100), 2);
-}
-
+		foreach($crimeTotalPerPostcode as $crime) {
+			$crimePercentage[$crime->postcode] = number_format((($crime->count / $total) * 100), 2);
+		}
 
 		//Additional Info
 		$colours = array('primary', 'success', 'info', 'warning', 'danger');
 
 		//display view
-		return View::make('postcode.show')
-			->with('viewingPeriod', $viewingPeriod)
-			->with('crimes', $crimes)
-			->with('crimeTotal', $crimeTotal)
-			->with('crimeGraph', $crimeGraph)
-			->with('highestCrime', $highestCrime)
-			->with('crimePercentage', $crimePercentage)
-			->with('centrelink', $centrelink)
-			->with('realestates', $realestates)
-			->with('postcode', $postcode)
-			->with('colours', $colours)
-			->with('compareToCentrelinkSmaller', $compareToCentrelinkSmaller)
-			->with('compareToCentrelinkLarger', $compareToCentrelinkLarger);
-
-
+		return View::make('postcode.show', compact('viewingPeriod', 'crimes', 'crimeTotal', 'crimeGraph', 'highestCrime', 'crimePercentage', 'centrelink', 'compareToCentrelinkSmaller', 'compareToCentrelinkLarger', 'realestates', 'postcode', 'colours'));
 	}
 
 	public function missingMethod($parameters = array())
