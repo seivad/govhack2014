@@ -125,9 +125,12 @@ class PostcodeController extends \BaseController {
 
 
 		//Treat the arrays
-		array_walk_recursive($centrelink[0], function(&$value) {
+		if( count($centrelink) > 1 ) :
+array_walk_recursive($centrelink[0], function(&$value) {
 		  $value = htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
 		});
+endif;
+
 
 		//Used for Centrelink Comparisons
 		$smallerPostcode = $postcode;
@@ -141,14 +144,19 @@ class PostcodeController extends \BaseController {
 		$compareToCentrelinkLarger = DB::table('centrelink')->where('postcode', '=', $largerPostcode)->get();
 
 		//Remove the HTML issue with the less than sign in the database from the dataset
-		array_walk_recursive($compareToCentrelinkSmaller[0], function(&$value) {
+if( count($compareToCentrelinkSmaller) > 1 ) :
+array_walk_recursive($compareToCentrelinkSmaller[0], function(&$value) {
 		  $value = htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
-		});
-
+		});	
+endif;
+	
+	
 		//Remove the HTML issue with the less than sign in the database from the dataset
-		array_walk_recursive($compareToCentrelinkLarger[0], function(&$value) {
+if( count($compareToCentrelinkLarger) > 1 ) :
+array_walk_recursive($compareToCentrelinkLarger[0], function(&$value) {
 		  $value = htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
 		});
+endif;
 
 		$crimeTotal = DB::table('crime')
 								->select(DB::raw('postcode, COUNT(*) AS count'))
@@ -157,6 +165,9 @@ class PostcodeController extends \BaseController {
 								->groupBy('postcode')
 								->orderBy('postcode', 'ASC')
 								->get();
+								
+								//print_r($crimeTotal);
+								//exit;
 
 		$highestCrime = DB::table('crime')
 								->select(DB::raw('postcode, offence_description, COUNT(*) AS count'))
